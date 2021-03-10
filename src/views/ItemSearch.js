@@ -147,11 +147,11 @@ const ItemSearch = (props) => {
     }
 
     const insertWish = (item) => {
-        props.socket.emit('insert_wish', props.user, item)
+        props.socket.emit('insert_wish', props.user, item, props.alias)
     }
 
     const deleteWish = (item) => {
-        props.socket.emit('delete_wish', props.user, item)
+        props.socket.emit('delete_wish', props.user, item, props.alias)
     }
 
     const renderHighlight = (item) => {

@@ -27,9 +27,17 @@ import Container from '@material-ui/core/Container'
 import Slide from '@material-ui/core/Slide'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Popover from '@material-ui/core/Popover'
+import FormControl from '@material-ui/core/FormControl'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import Grid from '@material-ui/core/Grid'
+import Modal from '@material-ui/core/Modal'
+import Backdrop from '@material-ui/core/Backdrop'
+import Fade from '@material-ui/core/Fade'
 
 import './App.css'
 import UserList from './views/UserList'
+import { TextField } from '@material-ui/core'
 
 const ENDPOINT = 'https://tegritydatabase.com'
 const CLIENT_ID = '769370226835193876'
@@ -38,9 +46,26 @@ const socket = io(ENDPOINT)
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    links: {
+      color: 'white'
+    }
+  },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
   },
   menuButton: {
     marginRight: theme.spacing(2),
+    links: {
+      color: 'white'
+    }
   },
   title: {
     flexGrow: 1,
@@ -78,16 +103,17 @@ function App(props) {
     id:0,
     login:0
   })
+
+  const [selectedAlias, setSelectedAlias] = React.useState("")
   const [items, setItems] = React.useState([])
   const [wishes, setWishes] = React.useState([])
+  const [alias, setAlias] = React.useState([])
   const [auditTrail, setAuditTrail] = React.useState([])
   const [usersReserves, setUsersReserves] = React.useState([])
   const [userList, setUserList] = React.useState([])
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [modelOpen, setModelOpen] = React.useState(false)
+  const [aliasField, setAliasField] = React.useState('')
 
   useEffect(() => {
     let queryString = window.location.search
@@ -128,6 +154,7 @@ function App(props) {
       admin: userData.admin ,
       login: 1
     })
+    socket.emit('getAllAlias', userData)
   })
 
   socket.on('update_audit_trail', (auditTrailData) => {
@@ -138,6 +165,11 @@ function App(props) {
     setUsersReserves(reservesData)
   })
 
+  socket.on('alias', (aliasdata) => {
+    setAlias(aliasdata)
+    console.log(aliasdata)
+    setSelectedAlias(0)
+  })
 
   socket.on('items', (items) => {
     setItems(items)
@@ -161,9 +193,14 @@ function App(props) {
     })
   }
 
-  const handleClose = () => {
-    setAnchorEl(null)
+  const handleModelOpen = () => {
+    setModelOpen(true);
   }
+
+  const handleModelClose = () => {
+    setModelOpen(false);
+  }
+
   const getAuditTrail = () => {
     socket.emit('get_audit_trail')
   }
@@ -184,8 +221,19 @@ function App(props) {
     socket.emit('getItems', user)
   }
 
-  const openTicket =(e) => {
-    setAnchorEl(e.currentTarget)
+  const changeSelectedAlias = (e) => {
+    setSelectedAlias(e.target.value)
+  }
+
+  const handleAliasChange = (e) => {
+    setAliasField(e.target.value)
+  }
+
+  const handleAliasAdd = () => {
+    setModelOpen(false)
+    socket.emit('addAlias', user, aliasField)
+    setAliasField('')
+
   }
 
   const displayDashboard = () => {
@@ -194,28 +242,58 @@ function App(props) {
           <Router>
             <CssBaseline />
             <AppBar position="static">
+                  <Modal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              anchorEl={anchorEl}
+              className={classes.modal}
+              open={modelOpen}
+              onClose={handleModelClose}
+              closeAfterTransition
+              BackdropComponent={Backdrop}
+              BackdropProps={{
+                timeout: 500,
+              }}
+            >
+              <Fade in={modelOpen}>
+                <div className={classes.paper}>
+                  <h2 id="transition-modal-title">Add Character Alias</h2>
+                  <p id="transition-modal-description">
+                  <TextField id="outlined-basic" label="Character Name" variant="outlined" defaultValue={aliasField} value={aliasField} onChange={handleAliasChange} />
+                  <br />
+                  <Button onClick={handleAliasAdd}>ADD</Button>
+                  <Button onClick={handleModelClose}>CLOSE</Button>
+                  </p>
+                </div>
+              </Fade>
+            </Modal>
               <Toolbar>
-                <Typography  edge="start" variant="h6" color="inherit" className={classes.title}>
-                ({user.username}#{user.discriminator})&nbsp;Tegrity Beta
+                <Typography edge="start" variant="h6" color="inherit" className={classes.title}>
+                <Grid container spacing={0}>
+                  <Grid item xs={12}>
+                  ({user.username}#{user.discriminator})&nbsp;Tegrity Beta <br />
+                    </Grid>
+                  </Grid>
                 </Typography>
-                <Typography className={classes.title}>
-                  <Button aria-describedby={id} variant='contained' onClick={openTicket} color="secondary">Open Ticket</Button>
-                  <Popover
-                    id={id}
-                    open={open}
-                    anchorEl={anchorEl}
-                    onClose={handleClose}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'center',
-                    }}
-                  >
-                    <Typography className={classes.typography}>This button does nothing.</Typography>
-                  </Popover>
+                <Typography className={classes.menuButton}>
+                <FormControl m={1}>
+                          <Select
+                            labelId="alias"
+                            id="alias"
+                            value={selectedAlias}
+                            onChange={changeSelectedAlias}
+                            label="Alias"
+                          >
+                            <MenuItem value="" disabled>
+                            </MenuItem>
+                            {
+                              alias.map((data, index) => {
+                                return <MenuItem value={index} key={index}>{data.name}</MenuItem>
+                              })
+                            }
+                          </Select>
+                        </FormControl>
+                        <Button onClick={handleModelOpen}>ADD</Button>
                 </Typography>
                 <Typography className={classes.menuButton}>
                   <Link to='/item-search' onClick={getItems} >Item Search</Link>
@@ -243,10 +321,10 @@ function App(props) {
               <Box>
                 <Switch>
                   <Route path='/item-search'>
-                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems}/>
+                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems} alias={alias[selectedAlias]}/>
                   </Route>
                   <Route path='/wish-list'>
-                    <WishList items={items} socket={socket} user={user} wishes={wishes} setWishes={setWishes}  getWishes={getWishes}/>
+                    <WishList items={items} socket={socket} user={user} wishes={wishes} setWishes={setWishes}  getWishes={getWishes} alias={alias}/>
                   </Route>
                   <Route path='/audit-trail'>
                     <AuditTrail auditTrail={auditTrail} getAuditTrail={getAuditTrail} />

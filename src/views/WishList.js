@@ -26,7 +26,8 @@ const WishList = (props) => {
 
     const columns = [
         { id: 'id', label: 'ID', minWidth: 50},
-        { id: 'name', label: 'Name', minWidth: 170},
+        { id: 'character_id', label: 'Character Name', minWidth: 75},
+        { id: 'name', label: 'Name', minWidth: 250},
         { id: 'npc', label: 'npc', minWidth: 100},
         {
           id: 'type',
@@ -36,7 +37,7 @@ const WishList = (props) => {
         {
           id: 'slot',
           label: 'slot',
-          minWidth: 50,
+          minWidth: 150,
         },
         {
           id: 'zone',
@@ -51,7 +52,7 @@ const WishList = (props) => {
           {
               id: 'priority',
               label: '',
-              minWidth: 50
+              minWidth: 150
           }
       ]
 
@@ -83,7 +84,6 @@ const WishList = (props) => {
                 wishesObjectLocal[element.zone_name].push(element)
             }
         })
-
         return wishesObjectLocal
     }
 
@@ -121,6 +121,9 @@ const WishList = (props) => {
                             <TableRow hover role="checkbox" tabIndex={-1} key={index + row+ keyname} >
                                 <TableCell>
                                     {row.item_id}
+                                </TableCell>
+                                <TableCell>
+                                    {row.alias_id === '' ? row.user_id: row.alias_id}
                                 </TableCell>
                                 <TableCell>
                                     <img alt={row.item_name} src={`/images/${row.item_image_name}`}/>

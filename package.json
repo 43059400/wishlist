@@ -36,6 +36,7 @@
   },
   "scripts": {
     "start": "set PORT=80 && react-scripts start",
+    "https": "set HTTPS=true&&set PORT=443&&react-scripts start",
     "server": "nodemon ./server/app.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
