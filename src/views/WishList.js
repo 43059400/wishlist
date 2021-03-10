@@ -123,7 +123,7 @@ const WishList = (props) => {
                                     {row.item_id}
                                 </TableCell>
                                 <TableCell>
-                                    {row.alias_id === '' ? row.user_id: row.alias_id}
+                                    {row.alias_id}
                                 </TableCell>
                                 <TableCell>
                                     <img alt={row.item_name} src={`/images/${row.item_image_name}`}/>
