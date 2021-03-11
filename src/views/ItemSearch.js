@@ -145,13 +145,20 @@ const ItemSearch = (props) => {
             props.socket.emit('get_wish_list', props.user)
         }, 300)
     }
+    const fixAlias = () => {
+        let fixedAlias = {
+            user_id: props.alias.hasOwnProperty('id') ?  props.alias.id : props.alias.user_id
+        }
+
+        return fixedAlias
+    }
 
     const insertWish = (item) => {
-        props.socket.emit('insert_wish', props.user, item, props.alias)
+       props.socket.emit('insert_wish', props.user, item, fixAlias())
     }
 
     const deleteWish = (item) => {
-        props.socket.emit('delete_wish', props.user, item, props.alias)
+        props.socket.emit('delete_wish', props.user, item, fixAlias())
     }
 
     const renderHighlight = (item) => {

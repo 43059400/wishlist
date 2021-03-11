@@ -12,7 +12,7 @@ import io from 'socket.io-client'
 
 import ItemSearch from './views/ItemSearch'
 import WishList from './views/WishList'
-import AuditTrail from './views/AuditTrail'
+//import AuditTrail from './views/AuditTrail'
 import Reserves from './views/Reserves'
 //import Profile from './views/Profile'
 
@@ -108,7 +108,7 @@ function App(props) {
   const [items, setItems] = React.useState([])
   const [wishes, setWishes] = React.useState([])
   const [alias, setAlias] = React.useState([])
-  const [auditTrail, setAuditTrail] = React.useState([])
+  //const [auditTrail, setAuditTrail] = React.useState([])
   const [usersReserves, setUsersReserves] = React.useState([])
   const [userList, setUserList] = React.useState([])
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -157,9 +157,9 @@ function App(props) {
     socket.emit('getAllAlias', userData)
   })
 
-  socket.on('update_audit_trail', (auditTrailData) => {
-    setAuditTrail(auditTrailData)
-  })
+  //socket.on('update_audit_trail', (auditTrailData) => {
+   // setAuditTrail(auditTrailData)
+ // })
 
   socket.on('update_reserves', (reservesData) => {
     setUsersReserves(reservesData)
@@ -201,9 +201,9 @@ function App(props) {
     setModelOpen(false);
   }
 
-  const getAuditTrail = () => {
-    socket.emit('get_audit_trail')
-  }
+  //const getAuditTrail = () => {
+    //socket.emit('get_audit_trail')
+  //}
 
   const getReserves = () => {
     socket.emit('get_reserves')
@@ -223,6 +223,8 @@ function App(props) {
 
   const changeSelectedAlias = (e) => {
     setSelectedAlias(e.target.value)
+    console.log(alias[selectedAlias])
+    console.log(selectedAlias)
   }
 
   const handleAliasChange = (e) => {
@@ -301,10 +303,7 @@ function App(props) {
                 <Typography className={classes.menuButton}>
                   <Link to='/wish-list' onClick={getWishes} >My Wish List</Link>
                 </Typography>
-              
-                <Typography className={classes.menuButton}>
-                <Link to='/audit-trail'>Audit Trail</Link>  
-                </Typography>
+
                 <Typography className={classes.menuButton}>
                   <Link to='/reserves'>Reserves</Link>
                 </Typography>
@@ -325,9 +324,6 @@ function App(props) {
                   </Route>
                   <Route path='/wish-list'>
                     <WishList items={items} socket={socket} user={user} wishes={wishes} setWishes={setWishes}  getWishes={getWishes} alias={alias}/>
-                  </Route>
-                  <Route path='/audit-trail'>
-                    <AuditTrail auditTrail={auditTrail} getAuditTrail={getAuditTrail} />
                   </Route>
                   <Route path='/reserves'>
                   <Reserves usersReserves={usersReserves} getReserves={getReserves} />
