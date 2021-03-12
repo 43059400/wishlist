@@ -70,6 +70,17 @@ const Reserves = (props) => {
         setFilterReserves(e.target.value)
     }
 
+    const transformAlias = (alias_id) => {
+        let selected = ''
+        props.allAlias.forEach((myAlias) => {
+            if(myAlias.alias_id === alias_id) {
+                selected = myAlias.name
+            }
+        })
+
+        return selected
+    }
+
     const renderReservesListByZone = () => {
         let reservesObjectLocal = makeReservesObject()
 
@@ -106,7 +117,7 @@ const Reserves = (props) => {
                             </TableCell> 
                             <TableCell>
                                 {reservesObjectLocal[keyname][row]['reserve_list'].map((row, reserveIndex) => {
-                                    return(<span>{row.username}({row.priority})({row.alias_id})<br /></span>)
+                                    return(<span>{transformAlias(row.alias_id)} [Priority {row.priority}]<br />Discord: {row.username}<br /><br /></span>)
                                 })}
                             </TableCell>
                         </TableRow>

@@ -26,7 +26,7 @@ import Box from '@material-ui/core/Box'
 import Container from '@material-ui/core/Container'
 import Slide from '@material-ui/core/Slide'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import Popover from '@material-ui/core/Popover'
+//import Popover from '@material-ui/core/Popover'
 import FormControl from '@material-ui/core/FormControl'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -95,7 +95,6 @@ HideOnScroll.propTypes = {
   window: PropTypes.func,
 }
 
-
 function App(props) {
   const classes = useStyles()
   const [response, setResponse] = React.useState((new Date()).toString())
@@ -104,11 +103,11 @@ function App(props) {
     login:0
   })
 
-  const [selectedAlias, setSelectedAlias] = React.useState("")
   const [items, setItems] = React.useState([])
   const [wishes, setWishes] = React.useState([])
   const [alias, setAlias] = React.useState([])
   const [allAlias, setAllAlias] = React.useState([])
+  const [selectedAlias, setSelectedAlias] = React.useState(0)
   //const [auditTrail, setAuditTrail] = React.useState([])
   const [usersReserves, setUsersReserves] = React.useState([])
   const [userList, setUserList] = React.useState([])
@@ -141,8 +140,7 @@ function App(props) {
 
   useEffect(() => {
     if(user.login === 0 && user.id !== 0) {
-      socket.emit('getUserData', user.id)
-      socket.emit('get_all_alias')
+      socket.emit('getUserData', user)
     }
   }, [user])
 
@@ -155,7 +153,8 @@ function App(props) {
       admin: userData.admin ,
       login: 1
     })
-    socket.emit('getAllAlias', userData)
+    socket.emit('get_user_alias_list', userData)
+    socket.emit('get_all_alias', userData)
   })
 
   //socket.on('update_audit_trail', (auditTrailData) => {
@@ -166,9 +165,10 @@ function App(props) {
     setUsersReserves(reservesData)
   })
 
-  socket.on('alias', (aliasdata) => {
+  socket.on('update_alias_list', (aliasdata) => {
     setAlias(aliasdata)
     setSelectedAlias(0)
+
   })
 
   socket.on('items', (items) => {
@@ -183,9 +183,8 @@ function App(props) {
     setUserList(users)
   })
 
-  socket.on('update_all_alias', (upated_alias_list) => {
-    console.log(upated_alias_list)
-    setAllAlias(upated_alias_list)
+  socket.on('update_all_alias', (updated_alias_list) => {
+      setAllAlias(updated_alias_list)
   })
 
   const logOut = (e) => {
@@ -240,12 +239,28 @@ function App(props) {
     setAliasField('')
   }
 
-  const handleAliasIDToAlias = (alias_id) => {
-    allAlias.forEach((alias_data) => {
-      if(alias_data.alias_id = alias_id) {
-        return alias.name
-      }
-    })
+  const aliasMenu = () => {
+    return (
+      <div>
+        <FormControl m={1}>
+          <Select
+            labelId="alias"
+            id="alias"
+            value={selectedAlias}
+            onChange={changeSelectedAlias}
+            label="Alias"
+          >
+            <MenuItem value="" disabled>
+            </MenuItem>
+              {alias.map((data, index) => {
+                return <MenuItem value={index} key={index}>{data.name}</MenuItem>
+              })
+            }
+          </Select>
+        </FormControl>
+        <Button onClick={handleModelOpen}>ADD</Button>
+      </div>
+    )
   }
 
   const displayDashboard = () => {
@@ -288,24 +303,7 @@ function App(props) {
                   </Grid>
                 </Typography>
                 <Typography className={classes.menuButton}>
-                <FormControl m={1}>
-                          <Select
-                            labelId="alias"
-                            id="alias"
-                            value={selectedAlias}
-                            onChange={changeSelectedAlias}
-                            label="Alias"
-                          >
-                            <MenuItem value="" disabled>
-                            </MenuItem>
-                            {
-                              alias.map((data, index) => {
-                                return <MenuItem value={index} key={index}>{data.name}</MenuItem>
-                              })
-                            }
-                          </Select>
-                        </FormControl>
-                        <Button onClick={handleModelOpen}>ADD</Button>
+                {(user.login===1) ? aliasMenu() : '<div></div>'}
                 </Typography>
                 <Typography className={classes.menuButton}>
                   <Link to='/item-search' onClick={getItems} >Item Search</Link>
@@ -329,20 +327,20 @@ function App(props) {
             <Container>
               <Box>
                 <Switch>
-                  <Route path='/item-search'>
-                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems} alias={alias[selectedAlias]}/>
-                  </Route>
                   <Route path='/wish-list'>
-                    <WishList items={items} socket={socket} user={user} wishes={wishes} setWishes={setWishes}  getWishes={getWishes} alias={alias}/>
+                    <WishList items={items} socket={socket} user={user} wishes={wishes} setWishes={setWishes}  getWishes={getWishes} alias={alias} allAlias={allAlias}/>
                   </Route>
                   <Route path='/reserves'>
-                  <Reserves usersReserves={usersReserves} getReserves={getReserves} />
+                  <Reserves usersReserves={usersReserves} getReserves={getReserves} allAlias={allAlias}/>
+                  </Route>
+                  <Route path='/item-search'>
+                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems} alias={alias[selectedAlias]} allAlias={allAlias}/>
                   </Route>
                   <Route path='/user-list'>
                     <UserList userList={userList} getUserList={getUserList} /> 
                   </Route>
                   <Route path='/'>
-                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems} handleAliasIDToAlias={handleAliasIDToAlias} />
+                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems} alias={alias[selectedAlias]} allAlias={allAlias} />
                   </Route>
                 </Switch>
               </Box>

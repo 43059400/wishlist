@@ -18,7 +18,7 @@ import TrieSearch from 'trie-search'
 
 const columns = [
     { id: 'id', label: 'ID', minWidth: 50},
-    { id: 'name', label: 'Name', minWidth: 170},
+    { id: 'reserve', label: 'reserve', minWidth: 170},
     { id: 'npc', label: 'npc', minWidth: 100},
     {
       id: 'type',
@@ -147,9 +147,8 @@ const ItemSearch = (props) => {
     }
     const fixAlias = () => {
         let fixedAlias = {
-            user_id: props.alias.hasOwnProperty('id') ?  props.alias.id : props.alias.user_id
+            alias_id: props.alias.hasOwnProperty('id') ?  props.alias.id : props.alias.user_id
         }
-
         return fixedAlias
     }
 
@@ -158,7 +157,18 @@ const ItemSearch = (props) => {
     }
 
     const deleteWish = (item) => {
-        props.socket.emit('delete_wish', props.user, item, fixAlias())
+        let selected = ''
+        props.wishes.forEach((wish) => {
+            if(wish.item_id === item.id) {
+                props.allAlias.forEach((myAlias) => {
+                    if(myAlias.alias_id === wish.alias_id) {
+                        selected = myAlias
+                    }
+                })
+            } 
+        })
+        item.item_id = item.id
+        props.socket.emit('delete_wish', props.user, item, selected)
     }
 
     const renderHighlight = (item) => {
@@ -172,10 +182,15 @@ const ItemSearch = (props) => {
         return selected
     }
     const renderAlias = (item) => {
+
         let selected = ''
         props.wishes.forEach((wish) => {
             if(wish.item_id === item.id) {
-                selected = wish.alias_id 
+                props.allAlias.forEach((myAlias) => {
+                    if(myAlias.alias_id === wish.alias_id) {
+                        selected = myAlias.name
+                    }
+                })
             } 
         })
 

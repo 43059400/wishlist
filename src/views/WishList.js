@@ -57,7 +57,8 @@ const WishList = (props) => {
       ]
 
     const deleteWish = (item) => {
-        props.socket.emit('delete_wish', props.user, item)
+        item.id = item.item_id
+        props.socket.emit('delete_wish', props.user, item, item)
     }
 
     const handleWish = (item) => {
@@ -69,9 +70,9 @@ const WishList = (props) => {
     }
 
     const handleChangePriority = (e, item) => {
-        console.log(item)
+        item.id = item.item_id
         let priorityLocal = e.target.value
-        props.socket.emit('update_wish_priority', props.user, item, {user_id: item.alias_id}, priorityLocal)
+        props.socket.emit('update_wish_priority', props.user, item, item, priorityLocal)
     }
 
     const makeWishesObject = () => {
@@ -92,6 +93,17 @@ const WishList = (props) => {
         return wishes.sort((a, b)  => {
             return a.priority - b.priority
         }) 
+    }
+
+    const transformAlias = (alias_id) => {
+        let selected = ''
+        props.allAlias.forEach((myAlias) => {
+            if(myAlias.alias_id === alias_id) {
+                selected = myAlias.name
+            }
+        })
+
+        return selected
     }
 
     const renderWishListByZone = () => {
@@ -124,7 +136,7 @@ const WishList = (props) => {
                                     {row.item_id}
                                 </TableCell>
                                 <TableCell>
-                                    {row.alias_id}
+                                    {transformAlias(row.alias_id)}
                                 </TableCell>
                                 <TableCell>
                                     <img alt={row.item_name} src={`/images/${row.item_image_name}`}/>
