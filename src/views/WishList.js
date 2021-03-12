@@ -69,8 +69,9 @@ const WishList = (props) => {
     }
 
     const handleChangePriority = (e, item) => {
+        console.log(item)
         let priorityLocal = e.target.value
-        props.socket.emit('update_wish_priority', props.user, item, priorityLocal)
+        props.socket.emit('update_wish_priority', props.user, item, {user_id: item.alias_id}, priorityLocal)
     }
 
     const makeWishesObject = () => {

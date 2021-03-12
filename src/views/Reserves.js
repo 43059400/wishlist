@@ -106,7 +106,7 @@ const Reserves = (props) => {
                             </TableCell> 
                             <TableCell>
                                 {reservesObjectLocal[keyname][row]['reserve_list'].map((row, reserveIndex) => {
-                                    return(<span>{row.username}({row.priority})&nbsp;</span>)
+                                    return(<span>{row.username}({row.priority})({row.alias_id})<br /></span>)
                                 })}
                             </TableCell>
                         </TableRow>

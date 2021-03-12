@@ -171,6 +171,16 @@ const ItemSearch = (props) => {
 
         return selected
     }
+    const renderAlias = (item) => {
+        let selected = ''
+        props.wishes.forEach((wish) => {
+            if(wish.item_id === item.id) {
+                selected = wish.alias_id 
+            } 
+        })
+
+        return selected
+    }
 
     const handleWish = (item) => {
         renderHighlight(item) ? deleteWish(item) : insertWish(item)
@@ -215,6 +225,9 @@ const ItemSearch = (props) => {
                             <TableRow hover role="checkbox" tabIndex={-1} key={row.id} selected={renderHighlight(row)} >
                                 <TableCell>
                                     {row.id}
+                                </TableCell>
+                                <TableCell>
+                                    {renderAlias(row)}
                                 </TableCell>
                                 <TableCell>
                                     <img alt={row.name} src={`/images/${row.img_name}`}/>

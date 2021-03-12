@@ -108,6 +108,7 @@ function App(props) {
   const [items, setItems] = React.useState([])
   const [wishes, setWishes] = React.useState([])
   const [alias, setAlias] = React.useState([])
+  const [allAlias, setAllAlias] = React.useState([])
   //const [auditTrail, setAuditTrail] = React.useState([])
   const [usersReserves, setUsersReserves] = React.useState([])
   const [userList, setUserList] = React.useState([])
@@ -141,7 +142,7 @@ function App(props) {
   useEffect(() => {
     if(user.login === 0 && user.id !== 0) {
       socket.emit('getUserData', user.id)
-
+      socket.emit('get_all_alias')
     }
   }, [user])
 
@@ -167,7 +168,6 @@ function App(props) {
 
   socket.on('alias', (aliasdata) => {
     setAlias(aliasdata)
-    console.log(aliasdata)
     setSelectedAlias(0)
   })
 
@@ -181,6 +181,11 @@ function App(props) {
 
   socket.on('update_user_list', (users) => {
     setUserList(users)
+  })
+
+  socket.on('update_all_alias', (upated_alias_list) => {
+    console.log(upated_alias_list)
+    setAllAlias(upated_alias_list)
   })
 
   const logOut = (e) => {
@@ -223,8 +228,6 @@ function App(props) {
 
   const changeSelectedAlias = (e) => {
     setSelectedAlias(e.target.value)
-    console.log(alias[selectedAlias])
-    console.log(selectedAlias)
   }
 
   const handleAliasChange = (e) => {
@@ -235,7 +238,14 @@ function App(props) {
     setModelOpen(false)
     socket.emit('addAlias', user, aliasField)
     setAliasField('')
+  }
 
+  const handleAliasIDToAlias = (alias_id) => {
+    allAlias.forEach((alias_data) => {
+      if(alias_data.alias_id = alias_id) {
+        return alias.name
+      }
+    })
   }
 
   const displayDashboard = () => {
@@ -332,7 +342,7 @@ function App(props) {
                     <UserList userList={userList} getUserList={getUserList} /> 
                   </Route>
                   <Route path='/'>
-                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems}/>
+                    <ItemSearch items={items} socket={socket} user={user}  wishes={wishes} setWishes={setWishes} getItems={getItems} handleAliasIDToAlias={handleAliasIDToAlias} />
                   </Route>
                 </Switch>
               </Box>
