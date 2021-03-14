@@ -155,6 +155,9 @@ function App(props) {
     })
     socket.emit('get_user_alias_list', userData)
     socket.emit('get_all_alias', userData)
+    getReserves()
+    getWishes()
+    getUserList()
   })
 
   //socket.on('update_audit_trail', (auditTrailData) => {
