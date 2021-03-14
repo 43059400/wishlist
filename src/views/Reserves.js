@@ -116,8 +116,8 @@ const Reserves = (props) => {
                                 <a href={`https://classic.wowhead.com/item=${reservesObjectLocal[keyname][row].item_id}`} target='_blank' rel='noreferrer'>{row}</a>
                             </TableCell> 
                             <TableCell>
-                                {reservesObjectLocal[keyname][row]['reserve_list'].map((row, reserveIndex) => {
-                                    return(<span>{transformAlias(row.alias_id)} [Priority {row.priority}]<br />Discord: {row.username}<br /><br /></span>)
+                                {reservesObjectLocal[keyname][row]['reserve_list'].sort(function(a, b){return a.priority-b.priority}).map((row, reserveIndex) => {
+                                    return(<span>({row.priority})&nbsp;{transformAlias(row.alias_id)}&nbsp;</span>)
                                 })}
                             </TableCell>
                         </TableRow>
