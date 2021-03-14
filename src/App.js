@@ -15,6 +15,8 @@ import WishList from './views/WishList'
 //import AuditTrail from './views/AuditTrail'
 import Reserves from './views/Reserves'
 //import Profile from './views/Profile'
+import LoadingScreen from './views/Loading'
+
 
 import Button from '@material-ui/core/Button'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -114,6 +116,7 @@ function App(props) {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [modelOpen, setModelOpen] = React.useState(false)
   const [aliasField, setAliasField] = React.useState('')
+  const [loading, setLoading] = React.useState(true)
 
   useEffect(() => {
     let queryString = window.location.search
@@ -136,12 +139,15 @@ function App(props) {
     socket.on('FromAPI', data => {
       setResponse(new Date(Date.parse(data)).toString())
     })
+
   }, [])
 
   useEffect(() => {
     if(user.login === 0 && user.id !== 0) {
       socket.emit('getUserData', user)
+      
     }
+    setTimeout(() => setLoading(false), 6000)
   }, [user])
 
   socket.on('user', (userData) => {
@@ -267,7 +273,7 @@ function App(props) {
   }
 
   const displayDashboard = () => {
-    if(user.login === 1) {    
+    if(user.login === 1 && loading !== true ) {    
       return (
           <Router>
             <CssBaseline />
@@ -370,9 +376,18 @@ function App(props) {
     }
   }
 
+  const displayLoading = () => {
+    if(loading && user.login === 1) {
+      return (<LoadingScreen />)
+    } else {
+      return (<div></div>)
+    }
+  }
+
   return (
     <div className='root'>
         {displayLogin()}
+        {displayLoading()}
         {displayDashboard()}
     </div>
   )
